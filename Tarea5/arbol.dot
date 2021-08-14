@@ -1,0 +1,12 @@
+digraph dot
+{
+	node1[label="P:NOMBRE"];
+	node2[label="NOMBRE(3)"];
+	node3[label="NOMBRE2(02)"];
+	node4[label="NOMBRE3(23)"];
+	node5[label="NOMBRE3(13)"];
+	node3-> node4
+	node2-> node3
+	node2-> node5
+	node1-> node2
+}

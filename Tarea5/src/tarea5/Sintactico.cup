@@ -1,0 +1,96 @@
+//codigo usuario
+package tarea5;
+import java_cup.runtime.Symbol;
+import java.util.ArrayList;
+import java.io.StringReader;
+import activacion.*;
+
+
+//Codigo para el parser, variables, metodos
+parser code
+{:
+    //public Nodo nodo;
+    public Nodo nodeFlag = new Nodo();
+    public Tabla tabla = new Tabla();
+
+:}
+
+//Coidgo para las acciones gramaticales
+
+action code
+{:
+    Nodo nodeFlag=new Nodo();
+    Tabla tabla = new Tabla();
+:}
+
+//Declaraciones 
+terminal P_A, P_C, ID, PROGRAMA, PROCEDIMIENTO, PUNTO_COMA, END, BEGIN; 
+terminal DOS_PUNTOS, INTEGER, IGUAL, COMA, NUMERO, PARAMETRO; 
+
+
+
+// declaracion no terminales
+non terminal INICIO, s, p, f, d, b, metodo;
+
+
+//presedencia de menor a mayor
+//precedence left MAS;
+//precedence left POR;
+//precedence left MAS;
+
+
+
+start with INICIO;
+
+//Reglas Semanticas
+
+
+INICIO ::=    s;
+
+s::= PROGRAMA ID:a p BEGIN b:b END {://tabla.pintar();
+                tabla.nodoPadre = (Nodo) b;
+                //System.out.println("Padre: "+tabla.nodoPadre.getNodosHijo().toString());
+                tabla.setTxtNodoPadre("P:"+(String)a);
+                parser.tabla = tabla;
+    :}
+    |;
+
+p::= PROCEDIMIENTO ID:a P_A PARAMETRO P_C {:
+                nodeFlag= new Nodo((String)a,(String) a);
+    :} BEGIN f END {: Simbolo s = new Simbolo(nodeFlag,(String)a);
+                tabla.agregarSimbolo(s);
+    :} p 
+    | ;
+
+f::= metodo:a PUNTO_COMA {:nodeFlag.agregarHijo((Nodo)a);:} f 
+    |ID DOS_PUNTOS INTEGER PUNTO_COMA f
+    |ID IGUAL metodo:a PUNTO_COMA f {:nodeFlag.agregarHijo((Nodo)a);:}
+    |;
+
+d::= PARAMETRO:a {:RESULT = (String)a;:}
+    |NUMERO:a {:RESULT = (String)a;:}
+    | {:RESULT = "";:};
+
+b::= b:c ID DOS_PUNTOS INTEGER PUNTO_COMA  {:
+                Nodo nodo = (Nodo) c;
+                RESULT = nodo;
+                :}
+    |b:c ID IGUAL metodo:a PUNTO_COMA {:
+                Nodo nodo = (Nodo) c;
+                nodo.agregarHijo((Nodo)a);
+                RESULT = nodo;
+                :}
+    |b:c metodo:a PUNTO_COMA {:
+                Nodo nodo = (Nodo) c;
+                nodo.agregarHijo((Nodo)a);
+                RESULT = nodo;
+                :}
+    |{:
+                Nodo nodo = new Nodo("");
+                RESULT = nodo;
+        :};
+
+metodo::= ID:a P_A d:b P_C {:
+                Nodo nodo = new Nodo((String)a+"("+(String)b+")",(String)a);
+                RESULT = nodo;
+        :};
